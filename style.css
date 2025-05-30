@@ -1295,3 +1295,78 @@ footer {
         font-size: 1.1rem;
     }
 }
+
+/* --- Scroll Horizontal para Serviços e Feedbacks em Telas Pequenas --- */
+@media (max-width: 768px) {
+
+    /* --- Para a seção NOSSOS SERVIÇOS --- */
+    .services-grid {
+        display: flex; /* Muda de grid para flex */
+        flex-direction: row; /* Itens em linha */
+        overflow-x: auto; /* Permite rolar horizontalmente */
+        scroll-snap-type: x mandatory; /* Habilita o "snap" na rolagem horizontal */
+        
+        /* Espaçamento para não colar nas bordas da tela */
+        padding-left: 1rem;
+        padding-right: 1rem;
+        /* Espaçamento para a barra de rolagem, se visível */
+        padding-bottom: 1.5rem; 
+
+        /* Remove as propriedades de grid que não se aplicam mais aqui */
+        grid-template-columns: none; 
+        align-items: stretch; /* Garante que os cards tenham a mesma altura se o conteúdo variar */
+    }
+
+    .services-grid .service-card {
+        flex: 0 0 auto; /* Não deixa o card encolher ou esticar */
+        /* Largura do card no mobile - ajuste conforme o design */
+        /* Pode ser uma % da largura da tela (vw) ou um valor fixo com clamp */
+        width: clamp(280px, 85vw, 340px); /* Min de 280px, ideal de 85% da tela, max de 340px */
+        scroll-snap-align: start; /* Alinha o card no início da área visível ao "snapar" */
+        scroll-snap-stop: always; /* Garante que pare em cada card */
+    }
+
+    /* Para manter o espaçamento entre os cards, o 'gap' do flex funciona.
+       Se você tinha 'gap' no .services-grid para desktop, ele será aplicado.
+       Se não, pode adicionar margin-right a cada .service-card (exceto o último)
+       ou usar 'gap' no .services-grid. O CSS original já usa 'gap', então deve funcionar.
+    */
+
+
+    /* --- Para a seção FEEDBACKS --- */
+    .feedback-grid {
+        display: flex; /* Muda de grid para flex */
+        flex-direction: row; /* Itens em linha */
+        overflow-x: auto; /* Permite rolar horizontalmente */
+        scroll-snap-type: x mandatory; /* Habilita o "snap" na rolagem horizontal */
+
+        /* Espaçamento para não colar nas bordas da tela */
+        padding-left: 1rem;
+        padding-right: 1rem;
+        /* Espaçamento para a barra de rolagem, se visível */
+        padding-bottom: 1.5rem;
+
+        /* Remove as propriedades de grid que não se aplicam mais aqui */
+        grid-template-columns: none;
+        align-items: stretch; /* Garante que os cards tenham a mesma altura */
+    }
+
+    .feedback-grid .feedback-card {
+        flex: 0 0 auto; /* Não deixa o card encolher ou esticar */
+        /* Largura do card no mobile - ajuste conforme o design */
+        width: clamp(300px, 90vw, 360px); /* Min de 300px, ideal de 90% da tela, max de 360px */
+        scroll-snap-align: start; /* Alinha o card no início da área visível ao "snapar" */
+        scroll-snap-stop: always; /* Garante que pare em cada card */
+    }
+
+    /* Opcional: Esconder a barra de rolagem horizontal (pode afetar a usabilidade para quem usa mouse) */
+    .services-grid::-webkit-scrollbar,
+    .feedback-grid::-webkit-scrollbar {
+        display: none; /* Para navegadores WebKit (Chrome, Safari, Edge moderno) */
+    }
+    .services-grid,
+    .feedback-grid {
+        scrollbar-width: none; /* Para Firefox */
+        -ms-overflow-style: none; /* Para IE e Edge antigo (menos relevante hoje) */
+    }
+}
