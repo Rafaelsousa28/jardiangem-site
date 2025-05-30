@@ -341,8 +341,9 @@ function initializeHorizontalScroller(sectionId) {
     const observer = new ResizeObserver(entries => {
         for (let entry of entries) {
             // Apenas uma verificação simples, pode ser mais robusta
+           
             if(entry.target.scrollWidth > 0) {
-                 updateArrowStates();
+                  updateArrowStates();
             }
         }
     });
