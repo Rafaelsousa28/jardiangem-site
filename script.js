@@ -284,3 +284,82 @@ document.querySelectorAll('.feedback-card').forEach(card => {
     // as it could interfere with the hero's layout. If you want it back, uncomment and test carefully.
 
 }); // End of DOMContentLoaded
+
+// No seu script.js
+
+function initializeHorizontalScroller(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) {
+        console.warn(`Seção com ID "${sectionId}" não encontrada para o scroller.`);
+        return;
+    }
+
+    const wrapper = section.querySelector('.horizontal-scroll-wrapper');
+    if (!wrapper) {
+        console.warn(`Wrapper ".horizontal-scroll-wrapper" não encontrado na seção "${sectionId}".`);
+        return;
+    }
+
+    const scrollContainer = wrapper.querySelector('.services-grid, .feedback-grid');
+    const prevArrow = wrapper.querySelector('.prev-arrow');
+    const nextArrow = wrapper.querySelector('.next-arrow');
+
+    if (!scrollContainer || !prevArrow || !nextArrow) {
+        console.warn(`Elementos de scroll (container, prevArrow, ou nextArrow) não encontrados na seção "${sectionId}".`);
+        return;
+    }
+
+    function updateArrowStates() {
+        if (!scrollContainer) return; // Verificação adicional
+        // Tolerância para cálculos de floating point e fim da rolagem
+        const tolerance = 5; 
+
+        prevArrow.disabled = scrollContainer.scrollLeft <= tolerance;
+        nextArrow.disabled = scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth - tolerance;
+    }
+
+    prevArrow.addEventListener('click', () => {
+        if (!scrollContainer) return;
+        // Rola para a esquerda pela largura de um card visível (aproximadamente)
+        const cardWidth = scrollContainer.querySelector('.service-card, .feedback-card')?.offsetWidth || scrollContainer.clientWidth * 0.8;
+        scrollContainer.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+    });
+
+    nextArrow.addEventListener('click', () => {
+        if (!scrollContainer) return;
+        // Rola para a direita pela largura de um card visível (aproximadamente)
+        const cardWidth = scrollContainer.querySelector('.service-card, .feedback-card')?.offsetWidth || scrollContainer.clientWidth * 0.8;
+        scrollContainer.scrollBy({ left: cardWidth, behavior: 'smooth' });
+    });
+
+    // Atualiza o estado das setas quando a rolagem acontece
+    scrollContainer.addEventListener('scroll', updateArrowStates);
+
+    // Chama uma vez no início para definir o estado inicial correto das setas
+    // Adicionar um pequeno delay para garantir que o layout está pronto, especialmente no mobile
+    // Isso é particularmente importante se as dimensões dos cards são dinâmicas ou demoram a calcular
+    const observer = new ResizeObserver(entries => {
+        for (let entry of entries) {
+            // Apenas uma verificação simples, pode ser mais robusta
+            if(entry.target.scrollWidth > 0) {
+                 updateArrowStates();
+            }
+        }
+    });
+    observer.observe(scrollContainer);
+    
+    // Fallback caso ResizeObserver não dispare imediatamente ou para estado inicial
+    setTimeout(updateArrowStates, 200); 
+    window.addEventListener('resize', updateArrowStates); // Atualiza no redimensionamento da janela
+}
+
+// Inicializa para as duas seções
+// Certifique-se que suas seções <section> têm os IDs "services" e "feedback"
+document.addEventListener('DOMContentLoaded', () => {
+    // ... seu código existente do loader, cursor, partículas, etc. ...
+
+    initializeHorizontalScroller('services');
+    initializeHorizontalScroller('feedback');
+
+    // ... resto do seu script.js ...
+});

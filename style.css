@@ -159,6 +159,92 @@ nav {
     .logo img {
         height: 35px; /* Um pouco menor para mobile, ajuste conforme necessário */
     }
+
+    /* DENTRO de @media (max-width: 768px) { ... } */
+
+.horizontal-scroll-wrapper {
+    position: relative; /* Necessário para posicionar as setas absolutamente */
+    margin-bottom: 1rem; /* Espaço extra se o padding-bottom dos grids for removido */
+}
+
+.scroll-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10; /* Para ficar acima dos cards */
+    background-color: rgba(0, 255, 136, 0.2); /* Fundo neon sutil */
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    line-height: 36px; /* Ajuste para centralizar o texto da seta */
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.8; /* Começa um pouco transparente */
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.scroll-arrow:hover,
+.scroll-arrow:focus {
+    background-color: var(--neon-green);
+    color: var(--dark-bg);
+    opacity: 1;
+    transform: translateY(-50%) scale(1.1); /* Efeito de zoom no hover/focus */
+    box-shadow: 0 0 15px var(--neon-green);
+}
+
+.scroll-arrow:disabled { /* Estilo para quando a seta estiver desabilitada */
+    opacity: 0.2;
+    cursor: default;
+    pointer-events: none; /* Impede cliques */
+}
+
+.prev-arrow {
+    left: -5px; /* Ajuste para posicionar fora do conteúdo, mas acessível */
+}
+
+.next-arrow {
+    right: -5px; /* Ajuste para posicionar fora do conteúdo, mas acessível */
+}
+
+/* Ajuste no padding dos containers de scroll para não ter a barra por baixo E as setas */
+/* Se você tinha padding-bottom nos grids para a barra, pode remover ou reduzir se as setas forem suficientes */
+.services-grid,
+.feedback-grid {
+    /* padding-bottom: 0.5rem;  /* Reduzido ou removido se as setas forem a indicação principal */
+    /* Adiciona um pouco mais de padding nas laterais para as setas não cobrirem tanto os cards */
+    padding-left: 25px; /* Espaço para a seta da esquerda não sobrepor demais */
+    padding-right: 25px; /* Espaço para a seta da direita não sobrepor demais */
+}
+
+/* Ajuste para os cards não irem até a borda absoluta do container de scroll e sim da viewport */
+/* Isso é importante para o padding-left/right do .services-grid e .feedback-grid funcionar bem com o scroll-snap */
+.services-grid, .feedback-grid {
+    /* ... seus estilos de flex, overflow-x, scroll-snap-type ... */
+    /* Certifique-se que o padding original do container (services-grid/feedback-grid) não seja muito grande
+       para as setas ficarem bem posicionadas em relação ao conteúdo visível inicial.
+       Se os cards já tinham um offset por causa do padding no services-grid/feedback-grid,
+       as setas podem precisar de um left/right maior.
+       Ajuste o left/right das setas e o padding dos grids para ficarem harmonicos.
+       Por exemplo, se o services-grid/feedback-grid tem padding-left: 1rem;
+       a .prev-arrow poderia ter left: 1rem - (largura_da_seta / 2) + alguns_pixels_de_offset_visual
+       ou simplesmente um valor fixo como 5px ou 10px para ficar próximo da borda do conteúdo.
+    */
+     padding-left: calc(1rem + 15px); /* Exemplo: padding original + espaço para seta */
+     padding-right: calc(1rem + 15px); /* Exemplo: padding original + espaço para seta */
+
+}
+
+.prev-arrow {
+    left: 1rem; /* Alinha com o padding do container de scroll */
+}
+
+.next-arrow {
+    right: 1rem; /* Alinha com o padding do container de scroll */
+}
 }
 
 .nav-links {
