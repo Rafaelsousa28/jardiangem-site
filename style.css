@@ -1456,3 +1456,165 @@ footer {
         -ms-overflow-style: none; /* Para IE e Edge antigo (menos relevante hoje) */
     }
 }
+
+
+/* Owners Section Styles */
+.owners {
+    padding: 6rem 2rem;
+    background: var(--darker-bg); /* Fundo mais escuro para destaque */
+    position: relative;
+}
+
+.owners::after { /* Opcional: Linha de borda inferior estilizada */
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple, #7c3aed), transparent);
+    opacity: 0.5;
+}
+
+.owners-container {
+    display: flex;
+    flex-wrap: wrap; /* Para que os cards quebrem em telas menores */
+    justify-content: center; /* Centraliza os cards */
+    align-items: stretch; /* Faz os cards terem a mesma altura se o conteúdo variar */
+    gap: 3rem;
+    max-width: 1200px; /* Ajuste conforme necessário */
+    margin: 0 auto;
+}
+
+.owner-card {
+    background: var(--card-bg, rgba(255, 255, 255, 0.05));
+     border: 1px solid var(--neon-green, #00ff88); /* Borda com cor de destaque */
+    border-radius: 20px;
+    padding: 2.5rem;
+    text-align: center;
+    width: clamp(320px, 45%, 400px); /* Largura responsiva para os cards */
+    position: relative;
+    overflow: visible; /* Para o brilho do avatar e da borda não serem cortados */
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.owner-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 15px 40px rgba(124, 58, 237, 0.3); /* Sombra roxa */
+}
+
+.owner-card-border-glow { /* Efeito de brilho na borda sutil */
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    border-radius: 22px; /* Um pouco maior que o card */
+    box-shadow: 0 0 15px rgba(124, 58, 237, 0); /* Inicialmente sem brilho */
+    transition: box-shadow 0.4s ease;
+    pointer-events: none; /* Para não interferir com o mouse */
+    z-index: -1; /* Atrás do card */
+}
+
+.owner-card:hover .owner-card-border-glow {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.5), 0 0 30px rgba(124, 58, 237, 0.3);
+}
+
+.owner-avatar-wrapper {
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.owner-avatar {
+    width: 140px; /* Tamanho do avatar */
+    height: 140px;
+    border-radius: 50%;
+    border: 3px solid var(--neon-green, #00ff88);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4), 
+                inset 0 0 10px rgba(0, 255, 136, 0.2); /* Brilho interno */
+    object-fit: cover; /* Garante que a imagem cubra bem */
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.owner-card:hover .owner-avatar {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.6),
+                inset 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+.owner-info {
+    flex-grow: 1; /* Faz esta parte ocupar o espaço restante verticalmente */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Ajuda a espaçar o conteúdo interno */
+}
+
+.owner-name {
+    font-size: 1.75rem; /* Tamanho do nome */
+    color: var(--neon-green, #00ff88);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.owner-title {
+    font-size: 1rem;
+    color: var(--cyan, #06b6d4); /* Cor de destaque para o título */
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.owner-bio {
+    font-size: 0.95rem;
+    color: var(--text-secondary, #94a3b8);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    flex-grow: 1; /* Permite que a bio ocupe espaço e alinhe os botões sociais */
+}
+
+.owner-social-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem; /* Espaço entre os ícones sociais */
+    margin-top: auto; /* Empurra para baixo se a bio for curta */
+}
+
+.social-icon-link {
+    color: var(--text-secondary, #94a3b8);
+    font-size: 1.5rem; /* Tamanho dos ícones sociais */
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-icon-link:hover {
+    color: var(--neon-green, #00ff88);
+    transform: scale(1.2) rotate(5deg);
+}
+
+
+/* Responsividade para a seção de proprietários */
+@media (max-width: 768px) {
+    .owners-container {
+        flex-direction: column; /* Empilha os cards */
+        align-items: center; /* Centraliza os cards empilhados */
+        gap: 2.5rem;
+    }
+    .owner-card {
+        width: clamp(300px, 90vw, 400px); /* Cards ocupam mais da largura da tela */
+        padding: 2rem;
+    }
+    .owner-avatar {
+        width: 120px;
+        height: 120px;
+    }
+    .owner-name {
+        font-size: 1.5rem;
+    }
+    .owner-title {
+        font-size: 0.9rem;
+    }
+    .owner-bio {
+        font-size: 0.9rem;
+    }
+}

@@ -290,13 +290,13 @@ document.querySelectorAll('.feedback-card').forEach(card => {
 function initializeHorizontalScroller(sectionId) {
     const section = document.getElementById(sectionId);
     if (!section) {
-        console.warn(`Seção com ID "${sectionId}" não encontrada para o scroller.`);
+        // console.warn(`Seção com ID "${sectionId}" não encontrada para o scroller.`);
         return;
     }
 
     const wrapper = section.querySelector('.horizontal-scroll-wrapper');
     if (!wrapper) {
-        console.warn(`Wrapper ".horizontal-scroll-wrapper" não encontrado na seção "${sectionId}".`);
+        // console.warn(`Wrapper ".horizontal-scroll-wrapper" não encontrado na seção "${sectionId}".`);
         return;
     }
 
@@ -305,57 +305,121 @@ function initializeHorizontalScroller(sectionId) {
     const nextArrow = wrapper.querySelector('.next-arrow');
 
     if (!scrollContainer || !prevArrow || !nextArrow) {
-        console.warn(`Elementos de scroll (container, prevArrow, ou nextArrow) não encontrados na seção "${sectionId}".`);
+        // console.warn(`Elementos de scroll (container, prevArrow, ou nextArrow) não encontrados na seção "${sectionId}".`);
         return;
     }
 
+    const autoplayIntervalTime = 5000; // Intervalo do autoplay em milissegundos (5 segundos)
+    let autoplayTimer = null;
+    let userHasInteracted = false; // Flag para saber se o usuário já interagiu
+
     function updateArrowStates() {
-        if (!scrollContainer) return; // Verificação adicional
-        // Tolerância para cálculos de floating point e fim da rolagem
-        const tolerance = 5; 
+        if (!scrollContainer) return;
+        const tolerance = 5; // Pequena tolerância para o final da rolagem
 
         prevArrow.disabled = scrollContainer.scrollLeft <= tolerance;
         nextArrow.disabled = scrollContainer.scrollLeft + scrollContainer.clientWidth >= scrollContainer.scrollWidth - tolerance;
     }
 
+    function stopAutoplay() {
+        clearInterval(autoplayTimer);
+        autoplayTimer = null; // Limpa a referência do timer
+    }
+
+    function handleUserInteraction() {
+        userHasInteracted = true;
+        stopAutoplay();
+    }
+
+    function startAutoplay() {
+        // Só inicia o autoplay se o usuário não interagiu E se for tela pequena
+        if (userHasInteracted || window.innerWidth > 768) {
+            stopAutoplay(); // Garante que esteja parado se não atender às condições
+            return;
+        }
+
+        stopAutoplay(); // Limpa qualquer timer anterior para evitar múltiplos timers
+
+        autoplayTimer = setInterval(() => {
+            if (!scrollContainer) return;
+
+            const currentScroll = scrollContainer.scrollLeft;
+            const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+            // Pega o primeiro card para estimar a largura do scroll
+            const firstCard = scrollContainer.querySelector('.service-card, .feedback-card');
+            const scrollAmount = firstCard ? firstCard.offsetWidth : scrollContainer.clientWidth * 0.8;
+            // Considera o 'gap' se existir no container flex
+            const gapStyle = window.getComputedStyle(scrollContainer).gap;
+            const gapValue = gapStyle && gapStyle !== 'normal' ? parseFloat(gapStyle) : 0;
+
+
+            if (currentScroll >= maxScroll - 5) { // Se estiver perto do fim (com tolerância)
+                scrollContainer.scrollTo({ left: 0, behavior: 'smooth' }); // Volta para o início
+            } else {
+                scrollContainer.scrollBy({ left: scrollAmount + gapValue, behavior: 'smooth' });
+            }
+        }, autoplayIntervalTime);
+    }
+
+
     prevArrow.addEventListener('click', () => {
+        handleUserInteraction();
         if (!scrollContainer) return;
-        // Rola para a esquerda pela largura de um card visível (aproximadamente)
-        const cardWidth = scrollContainer.querySelector('.service-card, .feedback-card')?.offsetWidth || scrollContainer.clientWidth * 0.8;
-        scrollContainer.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+        const firstCard = scrollContainer.querySelector('.service-card, .feedback-card');
+        const scrollAmount = firstCard ? firstCard.offsetWidth : scrollContainer.clientWidth * 0.8;
+        const gapStyle = window.getComputedStyle(scrollContainer).gap;
+        const gapValue = gapStyle && gapStyle !== 'normal' ? parseFloat(gapStyle) : 0;
+        scrollContainer.scrollBy({ left: -(scrollAmount + gapValue), behavior: 'smooth' });
     });
 
     nextArrow.addEventListener('click', () => {
+        handleUserInteraction();
         if (!scrollContainer) return;
-        // Rola para a direita pela largura de um card visível (aproximadamente)
-        const cardWidth = scrollContainer.querySelector('.service-card, .feedback-card')?.offsetWidth || scrollContainer.clientWidth * 0.8;
-        scrollContainer.scrollBy({ left: cardWidth, behavior: 'smooth' });
+        const firstCard = scrollContainer.querySelector('.service-card, .feedback-card');
+        const scrollAmount = firstCard ? firstCard.offsetWidth : scrollContainer.clientWidth * 0.8;
+        const gapStyle = window.getComputedStyle(scrollContainer).gap;
+        const gapValue = gapStyle && gapStyle !== 'normal' ? parseFloat(gapStyle) : 0;
+        scrollContainer.scrollBy({ left: scrollAmount + gapValue, behavior: 'smooth' });
     });
 
-    // Atualiza o estado das setas quando a rolagem acontece
     scrollContainer.addEventListener('scroll', updateArrowStates);
+    scrollContainer.addEventListener('touchstart', handleUserInteraction, { passive: true });
 
-    // Chama uma vez no início para definir o estado inicial correto das setas
-    // Adicionar um pequeno delay para garantir que o layout está pronto, especialmente no mobile
-    // Isso é particularmente importante se as dimensões dos cards são dinâmicas ou demoram a calcular
+
+    // Lógica para iniciar/parar o autoplay com base no tamanho da tela e interação
+    function checkAndSetAutoplay() {
+        if (window.innerWidth <= 768 && !userHasInteracted) {
+            startAutoplay();
+        } else {
+            stopAutoplay();
+        }
+        updateArrowStates(); // Atualiza as setas também
+    }
+
+    // Observador para quando os cards estiverem realmente renderizados e com tamanho
     const observer = new ResizeObserver(entries => {
         for (let entry of entries) {
-            // Apenas uma verificação simples, pode ser mais robusta
-           
-            if(entry.target.scrollWidth > 0) {
-                  updateArrowStates();
+            if(entry.target.scrollWidth > 0) { // Garante que há conteúdo para rolar
+                 checkAndSetAutoplay(); // Inicia ou para o autoplay
+                 updateArrowStates(); // Estado inicial das setas
             }
         }
     });
-    observer.observe(scrollContainer);
-    
-    // Fallback caso ResizeObserver não dispare imediatamente ou para estado inicial
-    setTimeout(updateArrowStates, 200); 
-    window.addEventListener('resize', updateArrowStates); // Atualiza no redimensionamento da janela
+    if (scrollContainer.children.length > 0) { // Só observa se tiver cards
+        observer.observe(scrollContainer);
+    }
+
+
+    // Fallback e listener para redimensionamento da janela
+    setTimeout(checkAndSetAutoplay, 300); // Pequeno delay para garantir que tudo carregou
+    window.addEventListener('resize', () => {
+        // Resetar userHasInteracted se quisermos que o autoplay volte ao redimensionar para mobile
+        // Por ora, se o usuário interagiu uma vez, o autoplay não volta.
+        checkAndSetAutoplay();
+    });
 }
 
-// Inicializa para as duas seções
-// Certifique-se que suas seções <section> têm os IDs "services" e "feedback"
+// As chamadas para inicializar permanecem as mesmas, dentro do DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
     // ... seu código existente do loader, cursor, partículas, etc. ...
 
